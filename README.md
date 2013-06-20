@@ -1,5 +1,4 @@
 ## DvdPrime Mobile Server by frantik
-(http://www.johnogrady.com/assets/images/github.png)
 DvdPrime.com 사이트의 모바일 앱 지원을 위한 서버 입니다.
 
 ## License 
