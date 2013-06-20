@@ -1,24 +1,13 @@
-App Engine Java Guestbook
-Copyright (C) 2010-2012 Google Inc.
+## DvdPrime Mobile Server by frantik
+(http://www.johnogrady.com/assets/images/github.png)
+DvdPrime.com 사이트의 모바일 앱 지원을 위한 서버 입니다.
 
-## Sample guestbook for use with App Engine Java.
+## License 
 
-Requires [Apache Maven](http://maven.apache.org) 3.0 or greater, and JDK 6+ in order to run.
+* [Apache Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.html)
 
-To build, run
+## Copyright
 
-    mvn package
+Copyright (C) 2013 frantik
 
-Building will run the tests, but to explicitly run tests you can use the test target
-
-    mvn test
-
-To start the app, use the [App Engine Maven Plugin](http://code.google.com/p/appengine-maven-plugin/) that is already included in this demo.  Just run the command.
-
-    mvn appengine:devserver
-
-For further information, consult the [Java App Engine](https://developers.google.com/appengine/docs/java/overview) documentation.
-
-To see all the available goals for the App Engine plugin, run
-
-    mvn help:describe -Dplugin=appengine
+    
