@@ -15,6 +15,8 @@
  */
 package com.dvdprime.server.mobile.model;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -48,21 +50,27 @@ public class Filter
     public static void createOrUpdateFilter(FilterRequest param)
     {
         Entity filter = getSingleFilter(param.getId());
-        if (filter == null)
+        try
         {
-            filter = new Entity("Filter", param.getId());
-            filter.setProperty("target", param.getTargetId() + ":" + param.getTargetNick());
-        }
-        else
-        {
-            Map<String, String> targetMap = Splitter.on(',').omitEmptyStrings().withKeyValueSeparator(":").split((String) filter.getProperty("target"));
-            
-            if (!targetMap.containsKey(param.getTargetId()))
+            if (filter == null)
             {
-                targetMap.put(param.getTargetId(), param.getTargetNick());
+                filter = new Entity("Filter", param.getId());
+                filter.setProperty("target", param.getTargetId() + ":" + URLEncoder.encode(param.getTargetNick(), "utf-8"));
             }
-            
-            filter.setProperty("target", Joiner.on(",").withKeyValueSeparator(":").join(targetMap));
+            else
+            {
+                Map<String, String> targetMap = Splitter.on(',').omitEmptyStrings().withKeyValueSeparator(":").split((String) filter.getProperty("target"));
+                
+                if (!targetMap.containsKey(param.getTargetId()))
+                {
+                    targetMap.put(param.getTargetId(), URLEncoder.encode(param.getTargetNick(), "utf-8"));
+                }
+                
+                filter.setProperty("target", Joiner.on(",").withKeyValueSeparator(":").join(targetMap));
+            }
+        }
+        catch (UnsupportedEncodingException e)
+        {
         }
         Util.persistEntity(filter);
     }
@@ -102,7 +110,7 @@ public class Filter
      */
     public static Iterable<Entity> getAllFilters()
     {
-        Iterable<Entity> entities = Util.listEntities("Filter", null, null);
+        Iterable<Entity> entities = Util.listEntities("Filter");
         return entities;
     }
     

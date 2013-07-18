@@ -1,6 +1,3 @@
-/*
- * Copyright ⓒ 2011 Tuck & Company Inc. All Rights Reserved
- */
 package com.dvdprime.server.mobile.request;
 
 import javax.ws.rs.core.MultivaluedMap;

@@ -15,13 +15,17 @@
  */
 package com.dvdprime.server.mobile.model;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Date;
+import java.util.Iterator;
 
-import com.dvdprime.server.mobile.request.DeviceRequest;
+import com.dvdprime.server.mobile.request.NotificationRequest;
 import com.dvdprime.server.mobile.util.Util;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.common.base.Splitter;
 
 /**
  * This class defines the methods for basic operations of create, update &
@@ -30,7 +34,7 @@ import com.google.appengine.api.datastore.KeyFactory;
  * @author
  * 
  */
-public class Device
+public class Notification
 {
     
     /**
@@ -38,32 +42,38 @@ public class Device
      * else it updates the entity
      * 
      * @param param
-     *            {@link DeviceRequest}
+     *            {@link NotificationRequest}
      */
-    public static void createOrUpdateDevice(DeviceRequest param)
+    public static void createNotification(NotificationRequest param)
     {
-        Entity device = getSingleDevice(param.getId());
-        if (device == null)
+        if (param.getIds() != null)
         {
-            device = new Entity("Device", param.getId());
-            device.setProperty("token", param.getDeviceToken());
-            device.setProperty("version", param.getVersion());
-            device.setProperty("date", new Date().getTime());
-        }
-        else
-        {
-            if (param.getDeviceToken() != null && !"".equals(param.getDeviceToken()))
+            Iterable<String> ids = Splitter.on(',').omitEmptyStrings().split(param.getIds());
+            
+            if (ids != null)
             {
-                device.setProperty("token", param.getDeviceToken());
+                long creationTime = new Date().getTime();
+                Iterator<String> it = ids.iterator();
+                while (it.hasNext())
+                {
+                    
+                    try
+                    {
+                        Entity notification = new Entity("Notification");
+                        notification.setProperty("id", it.next());
+                        notification.setProperty("title", URLEncoder.encode(param.getTitle(), "utf-8"));
+                        notification.setProperty("message", URLEncoder.encode(param.getMessage(), "utf-8"));
+                        notification.setProperty("creation", creationTime);
+                        
+                        Util.persistEntity(notification);
+                    }
+                    catch (UnsupportedEncodingException e)
+                    {
+                    }
+                }
             }
-            if (param.getVersion() != null && !"".equals(param.getVersion()))
-            {
-                device.setProperty("version", param.getVersion());
-            }
-            device.setProperty("date", new Date().getTime());
         }
         
-        Util.persistEntity(device);
     }
     
     /**
@@ -71,9 +81,9 @@ public class Device
      * 
      * @return an iterable list with all the customers
      */
-    public static Iterable<Entity> getAllDevices()
+    public static Iterable<Entity> getAllNotifications()
     {
-        Iterable<Entity> entities = Util.listEntities("Device");
+        Iterable<Entity> entities = Util.listEntities("Notification");
         return entities;
     }
     
@@ -85,9 +95,9 @@ public class Device
      *            : member_id of the dvdprime
      * @return iterable with the members searched for
      */
-    public static Iterable<Entity> getDevice(String id)
+    public static Iterable<Entity> getNotification(String id)
     {
-        Iterable<Entity> entities = Util.listEntities("Device", "id", id);
+        Iterable<Entity> entities = Util.listEntities("Notification", "id", id, "creation");
         return entities;
     }
     
@@ -99,9 +109,9 @@ public class Device
      *            id : member_id of the dvdprime
      * @return the entity with the id as key
      */
-    public static Entity getSingleDevice(String id)
+    public static Entity getSingleNotification(String id)
     {
-        Key key = KeyFactory.createKey("Device", id);
+        Key key = KeyFactory.createKey("Notification", id);
         return Util.findEntity(key);
     }
 }

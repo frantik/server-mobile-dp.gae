@@ -5,4 +5,8 @@
 		<property name="token" direction="asc" />
 	</datastore-index>
 
+	<datastore-index kind="Notification" ancestor="false">
+		<property name="id" direction="asc" />
+		<property name="token" direction="asc" />
+	</datastore-index>
 </datastore-indexes>

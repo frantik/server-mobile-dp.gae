@@ -32,6 +32,7 @@ import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
+import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.appengine.api.datastore.Transaction;
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
@@ -150,6 +151,11 @@ public class Util
         }
     }
     
+    public static Iterable<Entity> listEntities(String kind)
+    {
+        return listEntities(kind, null, "");
+    }
+    
     /***
      * Search entities based on search criteria
      * 
@@ -168,6 +174,58 @@ public class Util
         if (searchFor != null && !"".equals(searchFor))
         {
             query.setFilter(new FilterPredicate(searchBy, FilterOperator.EQUAL, searchFor));
+        }
+        PreparedQuery pq = datastore.prepare(query);
+        return pq.asIterable();
+    }
+    
+    /***
+     * Search entities based on search criteria
+     * 
+     * @param kind
+     * @param searchBy
+     *            : Searching Criteria (Property)
+     * @param searchFor
+     *            : Searching Value List (Property Value)
+     * @return List all entities of a kind from the cache or datastore (if not
+     *         in cache) with the specified properties
+     */
+    public static Iterable<Entity> listEntities(String kind, String searchBy, List<String> searchFor)
+    {
+        logger.log(Level.INFO, "Search entities based on search criteria");
+        Query query = new Query(kind);
+        if (searchFor != null && !"".equals(searchFor))
+        {
+            query.setFilter(new FilterPredicate(searchBy, FilterOperator.IN, searchFor));
+        }
+        PreparedQuery pq = datastore.prepare(query);
+        return pq.asIterable();
+    }
+    
+    /***
+     * Search entities based on search criteria
+     * 
+     * @param kind
+     * @param searchBy
+     *            : Searching Criteria (Property)
+     * @param searchFor
+     *            : Searching Value (Property Value)
+     * @param sort
+     *            : Sort Value
+     * @return List all entities of a kind from the cache or datastore (if not
+     *         in cache) with the specified properties
+     */
+    public static Iterable<Entity> listEntities(String kind, String searchBy, String searchFor, String sort)
+    {
+        logger.log(Level.INFO, "Search entities based on search criteria");
+        Query query = new Query(kind);
+        if (searchFor != null && !"".equals(searchFor))
+        {
+            query.setFilter(new FilterPredicate(searchBy, FilterOperator.EQUAL, searchFor));
+        }
+        if (sort != null)
+        {
+            query.addSort(sort, SortDirection.DESCENDING);
         }
         PreparedQuery pq = datastore.prepare(query);
         return pq.asIterable();
