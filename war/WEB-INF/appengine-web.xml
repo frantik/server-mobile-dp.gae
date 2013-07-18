@@ -32,6 +32,7 @@
   	<include path="/**.css" />
   	<include path="/**.js" />
   	<include path="/**.png" />
+  	<include path="/**.ico" />
   </static-files>
 
 </appengine-web-app>
