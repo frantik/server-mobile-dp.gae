@@ -6,9 +6,11 @@ import java.util.logging.Logger;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -17,6 +19,7 @@ import com.dvdprime.server.mobile.constants.ResponseMessage;
 import com.dvdprime.server.mobile.model.Filter;
 import com.dvdprime.server.mobile.request.FilterRequest;
 import com.dvdprime.server.mobile.response.ErrorResponse;
+import com.dvdprime.server.mobile.response.ListResponse;
 import com.dvdprime.server.mobile.util.Util;
 
 /**
@@ -31,6 +34,29 @@ public class FilterResource
 {
     /** Logger */
     private final Logger logger = Logger.getLogger(FilterResource.class.getCanonicalName());
+    
+    /**
+     * 등록한 필터 목록
+     * 
+     * @param id
+     *            회원 아이디
+     * @return
+     */
+    @GET
+    public Response Get(@QueryParam("id")
+    String id)
+    {
+        logger.log(Level.INFO, "Get Filter : {0}", id);
+        
+        try
+        {
+            return Response.ok(new ListResponse(Filter.getRetriveFilters(id))).build();
+        }
+        catch (Exception e)
+        {
+            return Response.ok(ResponseMessage.SERVER_ERROR).build();
+        }
+    }
     
     /**
      * 필터 정보 등록
@@ -60,7 +86,7 @@ public class FilterResource
     String id, @FormParam("targetId")
     String targetId)
     {
-        logger.log(Level.INFO, "Deleting Filter: {}, {}", new Object[] { id, targetId });
+        logger.log(Level.INFO, "Deleting Filter: {0}, {1}", new Object[] { id, targetId });
         try
         {
             Filter.updateOrDeleteFilter(id, targetId);

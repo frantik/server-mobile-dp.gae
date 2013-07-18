@@ -65,7 +65,7 @@ public class DeviceResource
     String id, @FormParam("token")
     String token)
     {
-        logger.log(Level.INFO, "Deleting Device: {}, {}", new Object[] { id, token });
+        logger.log(Level.INFO, "Deleting Device: {0}, {1}", new Object[] { id, token });
         Iterable<Entity> entities = Util.listEntities("Device", "id", id);
         try
         {

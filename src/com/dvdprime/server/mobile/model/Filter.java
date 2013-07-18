@@ -15,6 +15,8 @@
  */
 package com.dvdprime.server.mobile.model;
 
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import com.dvdprime.server.mobile.request.FilterRequest;
@@ -24,6 +26,7 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
 
 /**
  * This class defines the methods for basic operations of create, update &
@@ -115,6 +118,44 @@ public class Filter
     {
         Iterable<Entity> entities = Util.listEntities("Filter", "id", id);
         return entities;
+    }
+    
+    /**
+     * Retrieve Filters
+     * 
+     * @param id
+     *            : member_id of the dvdprime
+     * @return
+     */
+    public static List<com.dvdprime.server.mobile.domain.Filter> getRetriveFilters(String id)
+    {
+        List<com.dvdprime.server.mobile.domain.Filter> mResult = null;
+        
+        try
+        {
+            Entity result = getSingleFilter(id);
+            
+            if (result != null)
+            {
+                Map<String, String> targetMap = Splitter.on(',').omitEmptyStrings().withKeyValueSeparator(":").split((String) result.getProperty("target"));
+                
+                if (targetMap != null && !targetMap.isEmpty())
+                {
+                    mResult = Lists.newArrayList();
+                    Iterator<String> keys = targetMap.keySet().iterator();
+                    while (keys.hasNext())
+                    {
+                        String key = keys.next();
+                        mResult.add(new com.dvdprime.server.mobile.domain.Filter(key, targetMap.get(key)));
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+        }
+        
+        return mResult;
     }
     
     /**
