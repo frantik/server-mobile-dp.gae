@@ -23,13 +23,16 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.dvdprime.server.mobile.request.NotificationRequest;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
+import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.Query.CompositeFilterOperator;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.api.datastore.Query.SortDirection;
@@ -229,6 +232,27 @@ public class Util
         }
         PreparedQuery pq = datastore.prepare(query);
         return pq.asIterable();
+    }
+    
+    /**
+     * Search Notification List
+     * 
+     * @param request
+     *            {@link NotificationRequest}
+     * @return
+     */
+    public static List<Entity> listNotification(NotificationRequest request)
+    {
+        logger.log(Level.INFO, "Search notifications entities based on NotificationRequest.class");
+        Query query = new Query("Notification");
+        FilterPredicate idFilter = new FilterPredicate("id", FilterOperator.EQUAL, request.getIds());
+        FilterPredicate timeFilter = new FilterPredicate("creationTime", FilterOperator.LESS_THAN_OR_EQUAL, request.getStartTime());
+        query.setFilter(CompositeFilterOperator.and(idFilter, timeFilter));
+        query.addSort("creationTime", SortDirection.DESCENDING);
+        
+        FetchOptions option = FetchOptions.Builder.withDefaults().offset((request.getPage() - 1) * request.getLimit()).limit(request.getLimit());
+        
+        return datastore.prepare(query).asList(option);
     }
     
     /**

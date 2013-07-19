@@ -23,7 +23,7 @@ import com.dvdprime.server.mobile.util.Util;
 import com.google.appengine.api.datastore.Entity;
 
 /**
- * 알림 정보 조회, 등록, 삭제
+ * 알림 정보  등록, 삭제
  * 
  * @author 작은광명
  * 
@@ -44,11 +44,20 @@ public class NotificationResource
     @POST
     public Response Post(final MultivaluedMap<String, String> formParameters)
     {
-        logger.log(Level.INFO, "Create Notification");
+        NotificationRequest param = NotificationRequest.fromMultiValuedFormParameters(formParameters);
+        logger.log(Level.INFO, "Create Notification params: {0}", param);
         
-        Notification.createNotification(NotificationRequest.fromMultiValuedFormParameters(formParameters));
+        try
+        {
+            Notification.createNotification(param);
+            
+            return Response.ok(ResponseMessage.SUCCESS).build();
+        }
+        catch (Exception e)
+        {
+            return Response.ok(ResponseMessage.SERVER_ERROR).build();
+        }
         
-        return Response.ok(ResponseMessage.SUCCESS).build();
     }
     
     /**

@@ -2,17 +2,17 @@ package com.dvdprime.server.mobile.request;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Date;
 
 import javax.ws.rs.core.MultivaluedMap;
 
 import lombok.Data;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 /**
- * 알림  파라미터
+ * 알림 파라미터
  * 
  * @author 작은광명
  * 
@@ -20,20 +20,35 @@ import org.codehaus.jackson.annotate.JsonProperty;
 @Data
 public class NotificationRequest
 {
-    /** Logger */
-    private static final Logger logger = Logger.getLogger(NotificationRequest.class.getCanonicalName());
-
     /** 회원 아이디 목록(콤마 구분) */
-    @JsonProperty("ids")
+    @JsonIgnore
     private String ids;
     
     /** 글 제목 */
-    @JsonProperty("title")
+    @JsonIgnore
     private String title;
     
     /** 메시지 */
-    @JsonProperty("message")
+    @JsonIgnore
     private String message;
+    
+    /** 링크 URL */
+    @JsonIgnore
+    private String linkUrl;
+    
+    /** 해당 오브젝트 고유번호 */
+    @JsonIgnore
+    private String targetKey;
+    
+    /** 페이지 */
+    private int page;
+    
+    /** 한페이지 표시 갯수 */
+    private int limit;
+    
+    /** 목록 호출용 시작 시간 */
+    @JsonProperty("startTime")
+    private long startTime;
     
     // //////////////////////////////////////////////////////////////
     //
@@ -42,6 +57,14 @@ public class NotificationRequest
     // //////////////////////////////////////////////////////////////
     public NotificationRequest()
     {
+    }
+    
+    public NotificationRequest(String id, int page, int limit, long startTime)
+    {
+        this.ids = id;
+        this.page = page;
+        this.limit = limit;
+        this.startTime = startTime == 0L ? new Date().getTime() : startTime;
     }
     
     /**
@@ -54,7 +77,9 @@ public class NotificationRequest
         result.setIds(nullSafeGetFormParameter("ids", formParameters));
         result.setTitle(nullSafeGetFormParameter("title", formParameters));
         result.setMessage(nullSafeGetFormParameter("message", formParameters));
-        logger.log(Level.INFO, "params: {0}", result.toString());
+        result.setLinkUrl(nullSafeGetFormParameter("linkUrl", formParameters));
+        result.setTargetKey(nullSafeGetFormParameter("targetKey", formParameters));
+        
         return result;
     }
     

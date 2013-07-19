@@ -27,12 +27,17 @@ import com.google.appengine.api.datastore.KeyFactory;
  * This class defines the methods for basic operations of create, update &
  * retrieve for customer entity
  * 
- * @author
+ * @author 작은광명
  * 
  */
 public class Device
 {
     
+    // //////////////////////////////////////////////////////////////
+    //
+    // Methods
+    //
+    // //////////////////////////////////////////////////////////////
     /**
      * Checks if the entity is existing and if it is not, it creates the entity
      * else it updates the entity

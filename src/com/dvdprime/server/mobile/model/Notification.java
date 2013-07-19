@@ -16,9 +16,13 @@
 package com.dvdprime.server.mobile.model;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
+
+import lombok.Data;
 
 import com.dvdprime.server.mobile.request.NotificationRequest;
 import com.dvdprime.server.mobile.util.Util;
@@ -26,17 +30,62 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
 
 /**
  * This class defines the methods for basic operations of create, update &
  * retrieve for customer entity
  * 
- * @author
+ * @author 작은광명
  * 
  */
+@Data
 public class Notification
 {
+    /** 글 제목 */
+    private String title;
     
+    /** 메시지 */
+    private String message;
+    
+    /** 링크 URL */
+    private String linkUrl;
+    
+    /** 해당 오브젝트 고유번호 */
+    private String targetKey;
+    
+    /** 등록 시간 */
+    private long creationTime;
+    
+    // //////////////////////////////////////////////////////////////
+    //
+    // Constructors
+    //
+    // //////////////////////////////////////////////////////////////
+    public Notification()
+    {
+    }
+    
+    public Notification(Entity entity)
+    {
+        try
+        {
+            this.title = URLDecoder.decode((String) entity.getProperty("title"), "utf-8");
+            this.message = URLDecoder.decode((String) entity.getProperty("message"), "utf-8");
+            this.linkUrl = URLDecoder.decode((String) entity.getProperty("linkUrl"), "utf-8");
+            this.targetKey = URLDecoder.decode((String) entity.getProperty("targetKey"), "utf-8");
+            this.creationTime = (Long) entity.getProperty("creationTime");
+        }
+        catch (UnsupportedEncodingException e)
+        {
+        }
+    }
+    
+    // //////////////////////////////////////////////////////////////
+    //
+    // Methods
+    //
+    // //////////////////////////////////////////////////////////////
     /**
      * Checks if the entity is existing and if it is not, it creates the entity
      * else it updates the entity
@@ -63,7 +112,9 @@ public class Notification
                         notification.setProperty("id", it.next());
                         notification.setProperty("title", URLEncoder.encode(param.getTitle(), "utf-8"));
                         notification.setProperty("message", URLEncoder.encode(param.getMessage(), "utf-8"));
-                        notification.setProperty("creation", creationTime);
+                        notification.setProperty("linkUrl", URLEncoder.encode(param.getLinkUrl(), "utf-8"));
+                        notification.setProperty("targetKey", URLEncoder.encode(param.getTargetKey(), "utf-8"));
+                        notification.setProperty("creationTime", creationTime);
                         
                         Util.persistEntity(notification);
                     }
@@ -93,12 +144,26 @@ public class Notification
      * 
      * @param id
      *            : member_id of the dvdprime
-     * @return iterable with the members searched for
+     * @return list with the members searched for
      */
-    public static Iterable<Entity> getNotification(String id)
+    public static List<Notification> retrieveNotification(NotificationRequest req)
     {
-        Iterable<Entity> entities = Util.listEntities("Notification", "id", id, "creation");
-        return entities;
+        List<Entity> entities = Util.listNotification(req);
+        
+        if (entities != null)
+        {
+            List<Notification> mResult = Lists.newArrayList();
+            for (Entity entity : entities)
+            {
+                mResult.add(new Notification(entity));
+            }
+            
+            return mResult;
+        }
+        else
+        {
+            return null;
+        }
     }
     
     /**

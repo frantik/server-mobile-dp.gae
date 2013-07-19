@@ -21,6 +21,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import lombok.Data;
+
 import com.dvdprime.server.mobile.request.FilterRequest;
 import com.dvdprime.server.mobile.util.Util;
 import com.google.appengine.api.datastore.Entity;
@@ -34,12 +36,38 @@ import com.google.common.collect.Lists;
  * This class defines the methods for basic operations of create, update &
  * retrieve for customer entity
  * 
- * @author
+ * @author 작은광명
  * 
  */
+@Data
 public class Filter
 {
+    /**
+     * 회원 아이디
+     */
+    private String id;
     
+    /**
+     * 회원 닉네임
+     */
+    private String nick;
+    
+    // //////////////////////////////////////////////////////////////
+    //
+    // Constructors
+    //
+    // //////////////////////////////////////////////////////////////
+    public Filter(String id, String nick)
+    {
+        this.id = id;
+        this.nick = nick;
+    }
+    
+    // //////////////////////////////////////////////////////////////
+    //
+    // Methods
+    //
+    // //////////////////////////////////////////////////////////////
     /**
      * Checks if the entity is existing and if it is not, it creates the entity
      * else it updates the entity
@@ -135,9 +163,9 @@ public class Filter
      *            : member_id of the dvdprime
      * @return
      */
-    public static List<com.dvdprime.server.mobile.domain.Filter> getRetriveFilters(String id)
+    public static List<Filter> getRetriveFilters(String id)
     {
-        List<com.dvdprime.server.mobile.domain.Filter> mResult = null;
+        List<Filter> mResult = null;
         
         try
         {
@@ -154,7 +182,7 @@ public class Filter
                     while (keys.hasNext())
                     {
                         String key = keys.next();
-                        mResult.add(new com.dvdprime.server.mobile.domain.Filter(key, targetMap.get(key)));
+                        mResult.add(new Filter(key, targetMap.get(key)));
                     }
                 }
             }
