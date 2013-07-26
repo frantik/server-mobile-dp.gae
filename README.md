@@ -1,22 +1,22 @@
 DVD PRIME Mobile Server
 ============
 
-![Logo](website/static/dp-logo.png)
+![Logo](gitsite/static/dp-logo.png)
 
 [dvdprime.com][1] 접속 APP을 지원하기 위한 모바일 서버입니다.
 
 Use Libraries
 --------
 
-__Jersey Framework
+1. Jersey Framework
 기본 RESTful API를 제공하기 위한 프레임워크로 [Jersey][2]를 사용하였습니다.
 제공하는 API는 설명하지 않겠습니다. 
 
-__Google App Engine
+2. Google App Engine
 서버는 [Google App Engine][3](이하 GAE)를 사용합니다.
 돈도 없고 무료로 이정도 퀄리티의 서버를 제공해주는 구글님께 감사할 뿐이죠. ^^
 
-__Google Clude Messaging for Android
+3. Google Clude Messaging for Android
 안드로이드 단말기에 푸시 메시지를 발송하기 위해서 [GCM-Server][4]를 사용합니다.
 
 License
