@@ -16,12 +16,17 @@
 package com.dvdprime.server.mobile.model;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import lombok.Data;
+
+import org.codehaus.jackson.annotate.JsonIgnore;
 
 import com.dvdprime.server.mobile.request.FilterRequest;
 import com.dvdprime.server.mobile.util.Util;
@@ -31,6 +36,7 @@ import com.google.appengine.api.datastore.KeyFactory;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 /**
  * This class defines the methods for basic operations of create, update &
@@ -42,6 +48,10 @@ import com.google.common.collect.Lists;
 @Data
 public class Filter
 {
+    /** Logger */
+    @JsonIgnore
+    private static Logger logger = Logger.getLogger(Filter.class.getCanonicalName());
+    
     /**
      * 회원 아이디
      */
@@ -59,8 +69,15 @@ public class Filter
     // //////////////////////////////////////////////////////////////
     public Filter(String id, String nick)
     {
-        this.id = id;
-        this.nick = nick;
+        try
+        {
+            this.id = id;
+            this.nick = URLDecoder.decode(nick, "utf-8");
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            logger.log(Level.WARNING, "caught a " + e.getClass() + " with message: " + e.getMessage(), e);
+        }
     }
     
     // //////////////////////////////////////////////////////////////
@@ -75,8 +92,10 @@ public class Filter
      * @param param
      *            {@link FilterRequest}
      */
-    public static void createOrUpdateFilter(FilterRequest param)
+    public static boolean createOrUpdateFilter(FilterRequest param)
     {
+        if (param.getId() == null || param.getTargetId() == null || param.getTargetNick() == null) { return false; }
+        
         Entity filter = getSingleFilter(param.getId());
         try
         {
@@ -87,7 +106,7 @@ public class Filter
             }
             else
             {
-                Map<String, String> targetMap = Splitter.on(',').omitEmptyStrings().withKeyValueSeparator(":").split((String) filter.getProperty("target"));
+                Map<String, String> targetMap = Maps.newHashMap(Splitter.on(',').omitEmptyStrings().withKeyValueSeparator(":").split((String) filter.getProperty("target")));
                 
                 if (!targetMap.containsKey(param.getTargetId()))
                 {
@@ -99,24 +118,38 @@ public class Filter
         }
         catch (UnsupportedEncodingException e)
         {
+            logger.log(Level.WARNING, "caught a " + e.getClass() + " with message: " + e.getMessage(), e);
+            return false;
         }
         Util.persistEntity(filter);
+        
+        return true;
     }
     
     /**
      * Checks if the entity is existing and if it is not, it creates the entity
      * else it updates the entity
      * 
-     * @param param
-     *            {@link FilterRequest}
+     * @param id
+     *            아이디
+     * @param targetId
+     *            삭제할 아이디
+     * @return
      */
-    public static void updateOrDeleteFilter(String id, String targetId)
+    public static boolean updateOrDeleteFilter(String id, String targetId)
     {
+        if (id == null || targetId == null) { return false; }
+        
         Entity filter = getSingleFilter(id);
         if (filter != null)
         {
-            Map<String, String> targetMap = Splitter.on(',').omitEmptyStrings().withKeyValueSeparator(":").split((String) filter.getProperty("target"));
-            targetMap.remove(targetId);
+            Map<String, String> targetMap = Maps.newHashMap(Splitter.on(',').omitEmptyStrings().withKeyValueSeparator(":").split((String) filter.getProperty("target")));
+            
+            Iterator<String> targets = Splitter.on(',').omitEmptyStrings().split(targetId).iterator();
+            while (targets.hasNext())
+            {
+                targetMap.remove(targets.next());
+            }
             
             if (targetMap.isEmpty())
             {
@@ -129,6 +162,8 @@ public class Filter
                 Util.persistEntity(filter);
             }
         }
+        
+        return true;
     }
     
     /**

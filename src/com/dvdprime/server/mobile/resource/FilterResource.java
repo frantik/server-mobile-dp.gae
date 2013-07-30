@@ -12,14 +12,12 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
 import com.dvdprime.server.mobile.constants.ResponseMessage;
 import com.dvdprime.server.mobile.model.Filter;
 import com.dvdprime.server.mobile.request.FilterRequest;
 import com.dvdprime.server.mobile.response.ErrorResponse;
-import com.dvdprime.server.mobile.response.ListResponse;
 import com.dvdprime.server.mobile.util.Util;
 
 /**
@@ -35,43 +33,48 @@ public class FilterResource
     /** Logger */
     private final Logger logger = Logger.getLogger(FilterResource.class.getCanonicalName());
     
-    /**
-     * 등록한 필터 목록
-     * 
-     * @param id
-     *            회원 아이디
-     * @return
-     */
     @GET
-    public Response Get(@QueryParam("id")
-    String id)
+    public Response Get()
     {
-        logger.log(Level.INFO, "Get Filter : {0}", id);
-        
-        try
-        {
-            return Response.ok(new ListResponse(Filter.getRetriveFilters(id))).build();
-        }
-        catch (Exception e)
-        {
-            return Response.ok(ResponseMessage.SERVER_ERROR).build();
-        }
+        return Response.ok(ResponseMessage.NOT_FOUND).build();
     }
     
     /**
      * 필터 정보 등록
      * 
-     * @param formParameters
+     * @param id
+     *            아이디
+     * @param targetId
+     *            지정 아이디
+     * @param targetNick
+     *            지정 닉네임
      * @return
      */
     @POST
-    public Response Post(final MultivaluedMap<String, String> formParameters)
+    public Response Post(@FormParam("id")
+    String id, @FormParam("targetId")
+    String targetId, @FormParam("targetNick")
+    String targetNick)
     {
-        logger.log(Level.INFO, "Create Filter");
+        FilterRequest params = new FilterRequest(id, targetId, targetNick);
+        logger.log(Level.INFO, "Create Filter: {0}", params);
         
-        Filter.createOrUpdateFilter(FilterRequest.fromMultiValuedFormParameters(formParameters));
-        
-        return Response.ok(ResponseMessage.SUCCESS).build();
+        try
+        {
+            if (Filter.createOrUpdateFilter(params))
+            {
+                return Response.ok(ResponseMessage.SUCCESS).build();
+            }
+            else
+            {
+                return Response.ok(ResponseMessage.FAIL).build();
+            }
+        }
+        catch (Exception e)
+        {
+            logger.log(Level.WARNING, "caught a " + e.getClass() + " with message: " + e.getMessage(), e);
+            return Response.ok(ResponseMessage.SERVER_ERROR).build();
+        }
     }
     
     /**
@@ -82,8 +85,8 @@ public class FilterResource
      * @return
      */
     @DELETE
-    public Response Delete(@FormParam("id")
-    String id, @FormParam("targetId")
+    public Response Delete(@QueryParam("id")
+    String id, @QueryParam("targetId")
     String targetId)
     {
         logger.log(Level.INFO, "Deleting Filter: {0}, {1}", new Object[] { id, targetId });
@@ -101,6 +104,7 @@ public class FilterResource
             }
             catch (IOException e1)
             {
+                logger.log(Level.WARNING, "caught a " + e.getClass() + " with message: " + e.getMessage(), e);
                 return Response.ok(ResponseMessage.SERVER_ERROR).build();
             }
         }

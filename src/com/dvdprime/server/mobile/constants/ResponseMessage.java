@@ -16,6 +16,9 @@ public class ResponseMessage
     /** 요청 성공 */
     public static final String SUCCESS = String.format(DEFAULT_MSG, HttpStatus.OK, "success");
     
+    /** 요청 실패 */
+    public static final String FAIL = String.format(DEFAULT_MSG, HttpStatus.OK, "fail");
+    
     /** 존재하지 않는 요청 또는 잘못된 요청 */
     public static final String NOT_FOUND = String.format(DEFAULT_MSG, HttpStatus.BAD_REQUEST, "잘못된 요청입니다.");
     

@@ -1,7 +1,5 @@
 package com.dvdprime.server.mobile.request;
 
-import javax.ws.rs.core.MultivaluedMap;
-
 import lombok.Data;
 
 import org.codehaus.jackson.annotate.JsonProperty;
@@ -36,21 +34,10 @@ public class FilterRequest
     {
     }
     
-    /**
-     * @param formParameters
-     * @return
-     */
-    public static FilterRequest fromMultiValuedFormParameters(MultivaluedMap<String, String> formParameters)
+    public FilterRequest(String id, String targetId, String targetNick)
     {
-        FilterRequest result = new FilterRequest();
-        result.setId(nullSafeGetFormParameter("id", formParameters));
-        result.setTargetId(nullSafeGetFormParameter("targetId", formParameters));
-        result.setTargetNick(nullSafeGetFormParameter("targetNick", formParameters));
-        return result;
-    }
-    
-    private static String nullSafeGetFormParameter(String parameterName, MultivaluedMap<String, String> formParameters)
-    {
-        return formParameters.get(parameterName) == null ? null : formParameters.get(parameterName).get(0);
+        this.id = id;
+        this.targetId = targetId;
+        this.targetNick = targetNick;
     }
 }
