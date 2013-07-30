@@ -93,7 +93,7 @@ public class Notification
      * @param param
      *            {@link NotificationRequest}
      */
-    public static void createNotification(NotificationRequest param)
+    public static boolean createNotification(NotificationRequest param)
     {
         if (param.getIds() != null)
         {
@@ -123,6 +123,11 @@ public class Notification
                     }
                 }
             }
+            return true;
+        }
+        else
+        {
+            return false;
         }
         
     }
