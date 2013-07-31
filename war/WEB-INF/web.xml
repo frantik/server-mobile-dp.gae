@@ -20,7 +20,7 @@
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>DvdPrime RESTful</servlet-name>
-		<url-pattern>/dp/*</url-pattern>
+		<url-pattern>/api/*</url-pattern>
 	</servlet-mapping>
 	
 	<servlet>

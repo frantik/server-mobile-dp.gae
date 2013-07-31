@@ -39,6 +39,7 @@
   	<include path="/**.js" />
   	<include path="/**.png" />
   	<include path="/**.ico" />
+  	<include path="/**.csv" />
   </static-files>
 
 </appengine-web-app>
