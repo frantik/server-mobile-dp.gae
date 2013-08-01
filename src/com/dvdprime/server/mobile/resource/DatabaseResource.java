@@ -40,7 +40,9 @@ public class DatabaseResource
     {
         try
         {
-            return Response.ok(new DataResponse(ImmutableMap.<String, Integer> builder().put("version", 20130701).build())).build();
+            DataResponse res = new DataResponse(ImmutableMap.<String, Integer> builder().put("version", 20130701).build());
+            res.setMessage("쿠르베게시판이 추가된 새로운 DB가 있습니다. (지금 업데이트 받으실려면 클릭)");
+            return Response.ok(res).build();
         }
         catch (Exception e)
         {
