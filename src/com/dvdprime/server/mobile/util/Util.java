@@ -1,5 +1,5 @@
 /**
- * Copyright 2011 Google
+ * Copyright 2013 작은광명
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.dvdprime.server.mobile.util;
 
 import java.io.IOException;
@@ -154,6 +153,35 @@ public class Util
         }
     }
     
+    /**
+     * Search and return the entity from the datastore
+     * 
+     * @param kind
+     *            : key to find the entity
+     * @param search
+     * @return
+     */
+    public static Entity findEntity(String kind, Map<String, Object> search)
+    {
+        logger.log(Level.INFO, "Search entity based on search criteria");
+        Query query = new Query(kind);
+        if (search != null && !search.isEmpty())
+        {
+            Iterator<String> iter = search.keySet().iterator();
+            while (iter.hasNext())
+            {
+                String key = iter.next();
+                query.setFilter(new FilterPredicate(key, FilterOperator.EQUAL, search.get(key)));
+            }
+            PreparedQuery pq = datastore.prepare(query);
+            return pq.asSingleEntity();
+        }
+        else
+        {
+            return null;
+        }
+    }
+    
     public static Iterable<Entity> listEntities(String kind)
     {
         return listEntities(kind, null, "");
@@ -232,6 +260,24 @@ public class Util
         }
         PreparedQuery pq = datastore.prepare(query);
         return pq.asIterable();
+    }
+    
+    /**
+     * Search Config List
+     * 
+     * @param id
+     *            Member ID
+     * @return
+     */
+    public static List<Entity> listConfig(String id)
+    {
+        logger.log(Level.INFO, "Search config entities based on member id");
+        Query query = new Query("Config");
+        query.setFilter(new FilterPredicate("id", FilterOperator.EQUAL, id));
+        
+        FetchOptions option = FetchOptions.Builder.withDefaults();
+        
+        return datastore.prepare(query).asList(option);
     }
     
     /**

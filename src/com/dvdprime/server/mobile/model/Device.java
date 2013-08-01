@@ -1,5 +1,5 @@
 /**
- * Copyright 2011 Google
+ * Copyright 2013 작은광명
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,12 @@
 package com.dvdprime.server.mobile.model;
 
 import java.util.Date;
+import java.util.Iterator;
 
 import com.dvdprime.server.mobile.request.DeviceRequest;
+import com.dvdprime.server.mobile.util.StringUtil;
 import com.dvdprime.server.mobile.util.Util;
 import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.KeyFactory;
 
 /**
  * This class defines the methods for basic operations of create, update &
@@ -45,30 +45,61 @@ public class Device
      * @param param
      *            {@link DeviceRequest}
      */
-    public static void createOrUpdateDevice(DeviceRequest param)
+    public static boolean createOrUpdateDevice(DeviceRequest param)
     {
-        Entity device = getSingleDevice(param.getId());
-        if (device == null)
+        Entity device = null;
+        long time = new Date().getTime();
+        Iterable<Entity> deviceList = getRetrieveDevice(param.getId());
+        if (deviceList == null)
         {
-            device = new Entity("Device", param.getId());
+            device = new Entity("Device");
+            device.setProperty("id", param.getId());
             device.setProperty("token", param.getDeviceToken());
             device.setProperty("version", param.getVersion());
-            device.setProperty("date", new Date().getTime());
+            device.setProperty("creationTime", time);
+            device.setProperty("updatedTime", time);
         }
         else
         {
-            if (param.getDeviceToken() != null && !"".equals(param.getDeviceToken()))
+            Iterator<Entity> iter = deviceList.iterator();
+            while (iter.hasNext())
             {
+                Entity entity = iter.next();
+                if (StringUtil.equals((String) entity.getProperty("token"), param.getDeviceToken()))
+                {
+                    device = entity;
+                    if (param.getVersion() != null && !"".equals(param.getVersion()))
+                    {
+                        device.setProperty("version", param.getVersion());
+                    }
+                    device.setProperty("updatedTime", time);
+                    break;
+                }
+            }
+            if (device == null)
+            {
+                device = new Entity("Device");
+                device.setProperty("id", param.getId());
                 device.setProperty("token", param.getDeviceToken());
-            }
-            if (param.getVersion() != null && !"".equals(param.getVersion()))
-            {
                 device.setProperty("version", param.getVersion());
+                device.setProperty("creationTime", time);
+                device.setProperty("updatedTime", time);
             }
-            device.setProperty("date", new Date().getTime());
         }
         
-        Util.persistEntity(device);
+        try
+        {
+            if (device != null)
+            {
+                Util.persistEntity(device);
+            }
+        }
+        catch (Exception e)
+        {
+            return false;
+        }
+        
+        return true;
     }
     
     /**
@@ -90,23 +121,10 @@ public class Device
      *            : member_id of the dvdprime
      * @return iterable with the members searched for
      */
-    public static Iterable<Entity> getDevice(String id)
+    public static Iterable<Entity> getRetrieveDevice(String id)
     {
         Iterable<Entity> entities = Util.listEntities("Device", "id", id);
         return entities;
     }
     
-    /**
-     * Searches for a device and returns the entity as an iterable The search is
-     * key based instead of query
-     * 
-     * @param String
-     *            id : member_id of the dvdprime
-     * @return the entity with the id as key
-     */
-    public static Entity getSingleDevice(String id)
-    {
-        Key key = KeyFactory.createKey("Device", id);
-        return Util.findEntity(key);
-    }
 }

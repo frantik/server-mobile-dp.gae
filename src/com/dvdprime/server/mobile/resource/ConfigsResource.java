@@ -15,36 +15,54 @@
  */
 package com.dvdprime.server.mobile.resource;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.dvdprime.server.mobile.constants.ResponseMessage;
-import com.dvdprime.server.mobile.response.DataResponse;
-import com.google.common.collect.ImmutableMap;
+import com.dvdprime.server.mobile.model.Config;
+import com.dvdprime.server.mobile.response.ListResponse;
 
 /**
- * 게시판 디비 버전 조회
+ * 설정 목록 조회
  * 
  * @author 작은광명
  * 
  */
-@Path("/database")
+@Path("/configs")
 @Produces(MediaType.APPLICATION_JSON)
-public class DatabaseResource
+public class ConfigsResource
 {
+    /** Logger */
+    private final Logger logger = Logger.getLogger(ConfigsResource.class.getCanonicalName());
+    
+    /**
+     * 설정 정보 수정
+     * 
+     * @param id
+     *            회원 아이디
+     * @return
+     */
     @GET
-    public Response Get()
+    public Response Post(@QueryParam("id")
+    String id)
     {
+        logger.log(Level.INFO, "Config PUT params: id={0}", new Object[] { id });
+        
         try
         {
-            return Response.ok(new DataResponse(ImmutableMap.<String, Integer> builder().put("version", 20130701).build())).build();
+            return Response.ok(new ListResponse(Config.retrieveConfig(id))).build();
         }
         catch (Exception e)
         {
             return Response.ok(ResponseMessage.SERVER_ERROR).build();
         }
     }
+    
 }

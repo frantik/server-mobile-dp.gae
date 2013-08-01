@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <datastore-indexes autoGenerate="true">
+	<datastore-index kind="Config" ancestor="false">
+		<property name="id" direction="asc" />
+		<property name="type" direction="asc" />
+	</datastore-index>
+
 	<datastore-index kind="Device" ancestor="false">
 		<property name="id" direction="asc" />
 		<property name="token" direction="asc" />
@@ -9,4 +14,5 @@
 		<property name="id" direction="asc" />
 		<property name="creationTime" direction="desc" />
 	</datastore-index>
+
 </datastore-indexes>

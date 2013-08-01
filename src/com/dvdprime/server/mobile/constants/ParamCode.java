@@ -13,20 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.dvdprime.server.mobile.resource;
+package com.dvdprime.server.mobile.constants;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
+import java.util.List;
 
-@Path("/default")
-@Produces(MediaType.APPLICATION_JSON)
-public class DefaultResource
+import com.google.common.collect.Lists;
+
+public class ParamCode
 {
-    @GET
-    public String Get()
-    {
-        return "Hello, DvdPrime Mobile Server by frantik";
-    }
+    /** Config Comment Notification Type */
+    public static String CONFIG_TYPE_PUSH_CMT = "pushCmt";
+    
+    /** Config Type List */
+    public static List<String> CONFIG_TYPE_LIST = Lists.newArrayList("pushCmt");
 }
