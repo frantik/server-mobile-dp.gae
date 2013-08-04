@@ -17,8 +17,6 @@ package com.dvdprime.server.mobile.request;
 
 import java.util.Date;
 
-import javax.ws.rs.core.MultivaluedMap;
-
 import lombok.Data;
 
 import org.codehaus.jackson.annotate.JsonProperty;
@@ -57,21 +55,11 @@ public class DeviceRequest
     {
     }
     
-    /**
-     * @param formParameters
-     * @return
-     */
-    public static DeviceRequest fromMultiValuedFormParameters(MultivaluedMap<String, String> formParameters)
+    public DeviceRequest(String id, String token, String version)
     {
-        DeviceRequest result = new DeviceRequest();
-        result.setId(nullSafeGetFormParameter("id", formParameters));
-        result.setDeviceToken(nullSafeGetFormParameter("token", formParameters));
-        result.setVersion(nullSafeGetFormParameter("version", formParameters));
-        return result;
+        this.id = id;
+        this.deviceToken = token;
+        this.version = version;
     }
     
-    private static String nullSafeGetFormParameter(String parameterName, MultivaluedMap<String, String> formParameters)
-    {
-        return formParameters.get(parameterName) == null ? null : formParameters.get(parameterName).get(0);
-    }
 }

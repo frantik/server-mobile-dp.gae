@@ -47,6 +47,10 @@ public class Device
      */
     public static boolean createOrUpdateDevice(DeviceRequest param)
     {
+        if (param.getId() == null || param.getDeviceToken() == null) {
+            return false;
+        }
+        
         Entity device = null;
         long time = new Date().getTime();
         Iterable<Entity> deviceList = getRetrieveDevice(param.getId());

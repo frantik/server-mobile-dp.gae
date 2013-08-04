@@ -20,13 +20,14 @@ import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
 import com.dvdprime.server.mobile.constants.ResponseMessage;
@@ -50,16 +51,27 @@ public class DeviceResource
     /** Logger */
     private final Logger logger = Logger.getLogger(DeviceResource.class.getCanonicalName());
     
+    @Context
+    HttpServletRequest request;
+    
     /**
      * 디바이스 정보 등록
      * 
-     * @param formParameters
+     * @param id
+     *            회원 아이디
+     * @param token
+     *            디바이스 토큰
+     * @param version
+     *            디바이스 버전
      * @return
      */
     @POST
-    public Response Post(final MultivaluedMap<String, String> formParameters)
+    public Response Post(@FormParam("id")
+    String id, @FormParam("token")
+    String token, @FormParam("version")
+    String version)
     {
-        DeviceRequest param = DeviceRequest.fromMultiValuedFormParameters(formParameters);
+        DeviceRequest param = new DeviceRequest(id, token, version);
         logger.log(Level.INFO, "Create Device params: {0}", param);
         
         try
