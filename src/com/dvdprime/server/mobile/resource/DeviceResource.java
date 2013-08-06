@@ -26,6 +26,7 @@ import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -101,8 +102,8 @@ public class DeviceResource
      * @return
      */
     @DELETE
-    public Response Delete(@FormParam("id")
-    String id, @FormParam("token")
+    public Response Delete(@QueryParam("id")
+    String id, @QueryParam("token")
     String token)
     {
         logger.log(Level.INFO, "Deleting Device: {0}, {1}", new Object[] { id, token });
