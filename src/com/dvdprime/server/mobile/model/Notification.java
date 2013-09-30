@@ -21,6 +21,7 @@ import java.net.URLEncoder;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import lombok.Data;
 
@@ -29,8 +30,10 @@ import com.dvdprime.server.mobile.util.Util;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 /**
  * This class defines the methods for basic operations of create, update &
@@ -105,18 +108,28 @@ public class Notification
                 Iterator<String> it = ids.iterator();
                 while (it.hasNext())
                 {
-                    
                     try
                     {
-                        Entity notification = new Entity("Notification");
-                        notification.setProperty("id", it.next());
-                        notification.setProperty("title", URLEncoder.encode(param.getTitle(), "utf-8"));
-                        notification.setProperty("message", URLEncoder.encode(param.getMessage(), "utf-8"));
-                        notification.setProperty("linkUrl", URLEncoder.encode(param.getLinkUrl(), "utf-8"));
-                        notification.setProperty("targetKey", URLEncoder.encode(param.getTargetKey(), "utf-8"));
-                        notification.setProperty("creationTime", creationTime);
-                        
-                        Util.persistEntity(notification);
+                        String id = it.next();
+                        List<Entity> deviceList = Device.getRetrieveDevice(id);
+                        if (deviceList != null && !deviceList.isEmpty()) {
+                            Set<String> tokens = Sets.newHashSet();
+                            for (Entity entity : deviceList) {
+                                tokens.add((String) entity.getProperty("token"));
+                            }
+                            
+                            Entity notification = new Entity("Notification");
+                            notification.setProperty("id", id);
+                            notification.setProperty("tokens", Joiner.on(',').skipNulls().join(tokens.toArray()));
+                            notification.setProperty("title", URLEncoder.encode(param.getTitle(), "utf-8"));
+                            notification.setProperty("message", URLEncoder.encode(param.getMessage(), "utf-8"));
+                            notification.setProperty("linkUrl", URLEncoder.encode(param.getLinkUrl(), "utf-8"));
+                            notification.setProperty("targetKey", URLEncoder.encode(param.getTargetKey(), "utf-8"));
+                            notification.setProperty("status", 10);
+                            notification.setProperty("creationTime", creationTime);
+                            
+                            Util.persistEntity(notification);
+                        }
                     }
                     catch (UnsupportedEncodingException e)
                     {
@@ -141,6 +154,27 @@ public class Notification
     {
         Iterable<Entity> entities = Util.listEntities("Notification");
         return entities;
+    }
+    
+    public static List<Notification> getNotificationList()
+    {
+        List<Entity> entities = Util.listNotification();
+        
+        if (entities != null)
+        {
+            List<Notification> mResult = Lists.newArrayList();
+            for (Entity entity : entities)
+            {
+                mResult.add(new Notification(entity));
+            }
+            
+            return mResult;
+        }
+        else
+        {
+            return null;
+        }
+
     }
     
     /**

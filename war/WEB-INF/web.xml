@@ -35,7 +35,26 @@
 		<servlet-name>SystemServiceServlet</servlet-name>
 		<url-pattern>/_ah/spi/*</url-pattern>
 	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>GCMServlet</servlet-name>
+		<servlet-class>com.dvdprime.server.mobile.servlet.GCMServlet</servlet-class>
+	</servlet>
 
+	<servlet-mapping>
+		<servlet-name>GCMServlet</servlet-name>
+		<url-pattern>/cron/gcm</url-pattern>
+	</servlet-mapping>
+	
+	<security-constraint>
+		<web-resource-collection>
+			<url-pattern>/cron/*</url-pattern>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>admin</role-name>
+		</auth-constraint>
+	</security-constraint>
+	
 	<welcome-file-list>
 		<welcome-file>index.html</welcome-file>
 	</welcome-file-list>

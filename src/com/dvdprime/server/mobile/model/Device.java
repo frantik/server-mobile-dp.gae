@@ -16,7 +16,7 @@
 package com.dvdprime.server.mobile.model;
 
 import java.util.Date;
-import java.util.Iterator;
+import java.util.List;
 
 import com.dvdprime.server.mobile.request.DeviceRequest;
 import com.dvdprime.server.mobile.util.StringUtil;
@@ -24,8 +24,7 @@ import com.dvdprime.server.mobile.util.Util;
 import com.google.appengine.api.datastore.Entity;
 
 /**
- * This class defines the methods for basic operations of create, update &
- * retrieve for customer entity
+ * This class defines the methods for basic operations of create, update & retrieve for customer entity
  * 
  * @author 작은광명
  * 
@@ -39,22 +38,19 @@ public class Device
     //
     // //////////////////////////////////////////////////////////////
     /**
-     * Checks if the entity is existing and if it is not, it creates the entity
-     * else it updates the entity
+     * Checks if the entity is existing and if it is not, it creates the entity else it updates the entity
      * 
      * @param param
      *            {@link DeviceRequest}
      */
     public static boolean createOrUpdateDevice(DeviceRequest param)
     {
-        if (param.getId() == null || param.getDeviceToken() == null) {
-            return false;
-        }
+        if (param.getId() == null || param.getDeviceToken() == null) { return false; }
         
         Entity device = null;
         long time = new Date().getTime();
-        Iterable<Entity> deviceList = getRetrieveDevice(param.getId());
-        if (deviceList == null)
+        List<Entity> deviceList = getRetrieveDevice(param.getId());
+        if (deviceList == null || deviceList.isEmpty())
         {
             device = new Entity("Device");
             device.setProperty("id", param.getId());
@@ -65,10 +61,8 @@ public class Device
         }
         else
         {
-            Iterator<Entity> iter = deviceList.iterator();
-            while (iter.hasNext())
+            for (Entity entity : deviceList)
             {
-                Entity entity = iter.next();
                 if (StringUtil.equals((String) entity.getProperty("token"), param.getDeviceToken()))
                 {
                     device = entity;
@@ -118,17 +112,15 @@ public class Device
     }
     
     /**
-     * Searches for a customer and returns the entity as an iterable The search
-     * is performed by creating a query and searching for the attribute
+     * Searches for a customer and returns the entity as an iterable The search is performed by creating a query and searching for the attribute
      * 
      * @param id
      *            : member_id of the dvdprime
      * @return iterable with the members searched for
      */
-    public static Iterable<Entity> getRetrieveDevice(String id)
+    public static List<Entity> getRetrieveDevice(String id)
     {
-        Iterable<Entity> entities = Util.listEntities("Device", "id", id);
-        return entities;
+        return Util.listEntities("Device", "id", id);
     }
     
 }

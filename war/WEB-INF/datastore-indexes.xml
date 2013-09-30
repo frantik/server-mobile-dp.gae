@@ -12,6 +12,7 @@
 
 	<datastore-index kind="Notification" ancestor="false">
 		<property name="id" direction="asc" />
+		<property name="status" direction="asc" />
 		<property name="creationTime" direction="desc" />
 	</datastore-index>
 

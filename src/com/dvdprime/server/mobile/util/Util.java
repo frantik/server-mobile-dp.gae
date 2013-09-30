@@ -40,9 +40,7 @@ import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
 
 /**
- * This is the utility class for all servlets. It provides method for inserting,
- * deleting, searching the entity from data store. Also contains method for
- * displaying the entity in JSON format.
+ * This is the utility class for all servlets. It provides method for inserting, deleting, searching the entity from data store. Also contains method for displaying the entity in JSON format.
  * 
  */
 public class Util
@@ -84,8 +82,7 @@ public class Util
     }
     
     /**
-     * Delete the entity from persistent store represented by the key Also
-     * delete it from cache
+     * Delete the entity from persistent store represented by the key Also delete it from cache
      * 
      * @param key
      *            : key to delete the entity from the persistent store
@@ -113,8 +110,7 @@ public class Util
     }
     
     /**
-     * Delete the entities represented by a list of keys Delete the entitites
-     * from cache also
+     * Delete the entities represented by a list of keys Delete the entitites from cache also
      * 
      * @param keys
      *            : keys for the entities that are to be deleted
@@ -131,8 +127,7 @@ public class Util
     }
     
     /**
-     * Search and return the entity from the cache . If absent , search the
-     * datastore.
+     * Search and return the entity from the cache . If absent , search the datastore.
      * 
      * @param key
      *            : key to find the entity
@@ -195,10 +190,9 @@ public class Util
      *            : Searching Criteria (Property)
      * @param searchFor
      *            : Searching Value (Property Value)
-     * @return List all entities of a kind from the cache or datastore (if not
-     *         in cache) with the specified properties
+     * @return List all entities of a kind from the cache or datastore (if not in cache) with the specified properties
      */
-    public static Iterable<Entity> listEntities(String kind, String searchBy, String searchFor)
+    public static List<Entity> listEntities(String kind, String searchBy, String searchFor)
     {
         logger.log(Level.INFO, "Search entities based on search criteria");
         Query query = new Query(kind);
@@ -206,8 +200,7 @@ public class Util
         {
             query.setFilter(new FilterPredicate(searchBy, FilterOperator.EQUAL, searchFor));
         }
-        PreparedQuery pq = datastore.prepare(query);
-        return pq.asIterable();
+        return datastore.prepare(query).asList(FetchOptions.Builder.withDefaults());
     }
     
     /***
@@ -218,8 +211,7 @@ public class Util
      *            : Searching Criteria (Property)
      * @param searchFor
      *            : Searching Value List (Property Value)
-     * @return List all entities of a kind from the cache or datastore (if not
-     *         in cache) with the specified properties
+     * @return List all entities of a kind from the cache or datastore (if not in cache) with the specified properties
      */
     public static Iterable<Entity> listEntities(String kind, String searchBy, List<String> searchFor)
     {
@@ -243,8 +235,7 @@ public class Util
      *            : Searching Value (Property Value)
      * @param sort
      *            : Sort Value
-     * @return List all entities of a kind from the cache or datastore (if not
-     *         in cache) with the specified properties
+     * @return List all entities of a kind from the cache or datastore (if not in cache) with the specified properties
      */
     public static Iterable<Entity> listEntities(String kind, String searchBy, String searchFor, String sort)
     {
@@ -278,6 +269,24 @@ public class Util
         FetchOptions option = FetchOptions.Builder.withDefaults();
         
         return datastore.prepare(query).asList(option);
+    }
+    
+    /**
+     * Search Not Sent Notification List
+     * 
+     * @param request
+     *            {@link NotificationRequest}
+     * @return
+     */
+    public static List<Entity> listNotification()
+    {
+        logger.log(Level.INFO, "Search not sent notifications entities");
+        Query query = new Query("Notification");
+        FilterPredicate statusFilter = new FilterPredicate("status", FilterOperator.EQUAL, 10);
+        query.setFilter(CompositeFilterOperator.and(statusFilter));
+        query.addSort("creationTime", SortDirection.DESCENDING);
+        
+        return datastore.prepare(query).asList(FetchOptions.Builder.withDefaults());
     }
     
     /**
@@ -321,8 +330,7 @@ public class Util
     }
     
     /**
-     * Get the list of keys of all children for a given entity kind in a given
-     * entity group represented by the parent key
+     * Get the list of keys of all children for a given entity kind in a given entity group represented by the parent key
      * 
      * @param kind
      *            : Entity kind of the children that needs to be searched for
